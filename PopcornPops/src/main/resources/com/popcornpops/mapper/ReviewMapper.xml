@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ReviewMapper">
+	<insert id="create" parameterType="allDto">
+		INSERT INTO REVIEW (
+			rid,
+			fid,
+			rtitle,
+			content,
+			hit,
+			writer,
+			del,
+			w_date,
+			u_date
+		) VALUES (
+			seq_review_rid.NEXTVAL,
+			#{fid, jdbcType=NUMERIC},
+			#{rtitle, jdbcType=VARCHAR},
+			#{content, jdbcType=VARCHAR},
+			0,
+			#{writer, jdbcType=VARCHAR},
+			0,
+			sysdate,
+			sysdate
+		)
+	</insert>
+	<select id="read" parameterType="Integer" resultType="allDto">
+		SELECT 
+			f.poster,
+			r.rid,
+			r.rtitle,
+			r.w_date,
+			f.genre,
+			r.content,
+			r.writer,
+			f.fid
+		FROM REVIEW r, FILM f
+		WHERE r.fid = f.fid	
+		AND r.rid = #{rid, jdbcType=NUMERIC}
+		
+	</select>
+	
+	<select id="forUpdateData" parameterType="Integer" resultType="reviewDto">
+		SELECT 
+			*
+		FROM REVIEW
+		WHERE rid = #{rid, jdbcType=NUMERIC}
+	</select>
+	
+	<update id="update" parameterType="reviewDto">
+		UPDATE REVIEW
+		SET
+			rtitle = #{rtitle, jdbcType=VARCHAR},
+			content = #{content, jdbcType=VARCHAR},
+			u_date = sysdate
+		WHERE rid = #{rid, jdbcType=NUMERIC}
+	</update>
+	
+	<update id="delete" parameterType="Integer">
+		UPDATE REVIEW
+		SET
+			del = 1
+		WHERE rid = #{rid}
+	</update>
+	
+	<!-- fid에 해당하는 목록 페이지  -->
+	<select id="listAll" resultType="allDto" parameterType="Integer">
+		SELECT 
+			*
+		FROM REVIEW r, FILM f
+		WHERE r.fid = f.fid	AND r.fid = #{fid}
+		ORDER BY W_DATE DESC
+	</select>
+	<select id="listFilm" resultType="FilmDto" parameterType="Integer">
+		SELECT 
+			*
+		FROM FILM
+		WHERE fid = #{fid}
+	</select>
+		
+</mapper>
